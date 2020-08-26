@@ -1,47 +1,58 @@
 package testgroup.filmography.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import testgroup.filmography.userDAO.UserDAO;
 import testgroup.filmography.model.User;
+import testgroup.filmography.userDAO.UserDao;
 
 import java.util.List;
 
 @Service
-public class UserServiceImpl implements UserService{
-
-
-    private final UserDAO userDAO;
+@Transactional(readOnly = true)
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Autowired
-    public UserServiceImpl(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    private UserDao userDao;
+
+    @Override
+    @Transactional
+    public void createUser(User user) {
+        userDao.createUser(user);
     }
 
-
-    @Transactional
-    public List<User> allUsers() {
-        return userDAO.allUsers();
+    @Override
+    public List<User> getAllUsers() {
+        return userDao.getAllUsers();
     }
 
-    @Transactional
-    public void add(User user) {
-        userDAO.add(user);
+    @Override
+    public User getUserById(long id) {
+        return userDao.getUserById(id);
     }
 
-    @Transactional
-    public void delete(int id) {
-        userDAO.delete(id);
+    @Override
+    public User getUserByName(String name) {
+        return userDao.getUserByName(name);
     }
 
+    @Override
     @Transactional
-    public void edit(User user) {
-        userDAO.edit(user);
+    public void updateUser(User user) {
+        userDao.updateUser(user);
     }
 
+    @Override
     @Transactional
-    public User getById(int id) {
-        return userDAO.getById(id);
+    public void deleteUser(long id) {
+        userDao.deleteUser(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
+        return userDao.getUserByName(name);
     }
 }
